@@ -9,6 +9,10 @@ import os
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
+from flask import Flask
+from apscheduler.schedulers.background import BackgroundScheduler
+
+app = Flask(__name__)
 
 ISTZone = pytz.timezone("Asia/Kolkata")
 
@@ -103,22 +107,36 @@ def insertEntry(seq,stock_list):
   table.insert_one(obj)
   return obj
 
+def doJob():
+  
+  print("running scheduled job")
+  app.logger.info("running scheduled job")
+  seq = getCurrentSeq()
+
+  prev_entry = getEntryFromSequence(seq)
+
+  new_list = getStockList(screener_url)
+
+  seq = incrementSeq(seq)
+
+  new_entry = insertEntry(seq,new_list)
+
+
+  if prev_entry is not None:
+    handle_email(prev_entry,new_entry)
+
+  return 
+
+
+@app.route("/")
+def hello():
+  return {"currentStocks":getStockList(screener_url)},200
+
+scheduler = BackgroundScheduler()
+
+job = scheduler.add_job(doJob, 'interval', seconds = sleep_time)
+scheduler.start()
+
 if __name__ == "__main__":
-  while(True):
-    seq = getCurrentSeq()
-
-    prev_entry = getEntryFromSequence(seq)
-
-    new_list = getStockList(screener_url)
-
-    seq = incrementSeq(seq)
-
-    new_entry = insertEntry(seq,new_list)
-
-
-    if prev_entry is not None:
-      handle_email(prev_entry,new_entry)
-
-    time.sleep(sleep_time)
-
+ app.run()
   
