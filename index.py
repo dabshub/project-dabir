@@ -109,22 +109,26 @@ def insertEntry(seq,stock_list):
 
 def doJob():
   
-  print("running scheduled job")
-  app.logger.info("running scheduled job")
-  seq = getCurrentSeq()
+  try:
+    print("running scheduled job")
+    app.logger.info("running scheduled job")
+    seq = getCurrentSeq()
 
-  prev_entry = getEntryFromSequence(seq)
+    prev_entry = getEntryFromSequence(seq)
 
-  new_list = getStockList(screener_url)
+    new_list = getStockList(screener_url)
 
-  seq = incrementSeq(seq)
+    seq = incrementSeq(seq)
 
-  new_entry = insertEntry(seq,new_list)
+    new_entry = insertEntry(seq,new_list)
 
 
-  if prev_entry is not None:
-    handle_email(prev_entry,new_entry)
-
+    if prev_entry is not None:
+      handle_email(prev_entry,new_entry)
+  except Exception as e:
+    print(e)
+    app.logger.error(e)
+    
   return 
 
 
