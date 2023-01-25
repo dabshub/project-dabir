@@ -125,12 +125,13 @@ def doJob():
 
     if prev_entry is not None:
       handle_email(prev_entry,new_entry)
+
+    del new_entry["_id"]
+    return new_entry,200
   except Exception as e:
     print(e)
     app.logger.error(e)
-    
-  return 
-
+    return "exception occured while running job @ " + str(datetime.now(ISTZone).strftime("%m/%d/%Y, %H:%M:%S")),200
 
 @app.route("/")
 def hello():
@@ -138,7 +139,7 @@ def hello():
 
 @app.route("/intraday")
 def intraday():
-  doJob()
+  return doJob()
 
 if __name__ == "__main__":
  app.run()
