@@ -136,10 +136,9 @@ def doJob():
 def hello():
   return {"currentStocks":getStockList(screener_url)},200
 
-scheduler = BackgroundScheduler()
-
-job = scheduler.add_job(doJob, 'interval', seconds = sleep_time)
-scheduler.start()
+@app.route("/intraday")
+def intraday():
+  doJob()
 
 if __name__ == "__main__":
  app.run()
