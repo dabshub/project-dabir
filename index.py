@@ -129,7 +129,6 @@ def doJob():
     del new_entry["_id"]
     return new_entry,200
   except Exception as e:
-    print(e)
     app.logger.error(e)
     return "exception occured while running job @ " + str(datetime.now(ISTZone).strftime("%m/%d/%Y, %H:%M:%S")),200
 
